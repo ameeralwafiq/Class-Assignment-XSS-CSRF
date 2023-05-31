@@ -5,8 +5,8 @@ session_start();
 // Include server.php file
 include('server.php');
 
-// Check if the login form has been submitted
-if (isset($_POST['login_user'])) {
+// Check if the login form has been submitted and the CSRF token is valid
+if (isset($_POST['login_user']) && validate_csrf_token($_POST['csrf_token'])) {
     
     // Get the username and password from the login form
     $username = mysqli_real_escape_string($db, $_POST['username']);
@@ -38,7 +38,6 @@ if (isset($_POST['login_user'])) {
 <head>
   <title>Login Page</title>
   <link rel="stylesheet" type="text/css" href="css/style.css">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
 </head>
 <body>
   <div class="header">
@@ -49,12 +48,13 @@ if (isset($_POST['login_user'])) {
     <?php include('errors.php'); ?>
     <div class="input-group">
       <label>Username</label>
-      <input type="text" name="username" value="<?php echo htmlspecialchars($username); ?>">
+      <input type="text" name="username" value="<?php echo $username; ?>">
     </div>
     <div class="input-group">
       <label>Password</label>
       <input type="password" name="password">
     </div>
+    <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
     <div class="input-group">
       <button type="submit" class="btn" name="login_user">Login</button>
     </div>
@@ -64,3 +64,4 @@ if (isset($_POST['login_user'])) {
   </form>
 </body>
 </html>
+
